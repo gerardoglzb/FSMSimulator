@@ -1,0 +1,94 @@
+body {
+	margin: 0;
+}
+
+.container {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	float: left;
+}
+
+.left-bar {
+	width: 250px;
+	height: 100vh;
+	border-right: 5px solid black;
+}
+
+.left-bar-box {
+	width: 100%;
+	text-align: center;
+}
+
+.left-bar-box-title {
+	width: 100%;
+	font-family: 'Roboto', sans-serif;
+	font-size: 25px;
+}
+
+#testSample {
+	margin-top: 10px;
+	width: 75%;
+}
+
+#left-bar-box-1 {
+	margin-top: 50px;
+}
+
+.canvas {
+	/*width: 85%;*/
+	height: 100vh;
+}
+
+.state-ball {
+	font-family: 'Roboto', sans-serif;
+	cursor: pointer;
+	color: blue;
+	text-align: center;
+	vertical-align: middle;
+	font-size: 50px;
+	border-radius: 50%;
+	border: 3px solid orange;
+	position: absolute;
+	background-color: white;
+	/*display: flex;*/
+	/*align-items: center;*/
+}
+
+.inner-ball {
+	margin: 0 auto;
+	pointer-events: none;
+	position: absolute;
+	border-radius: 50%;
+	border: 1px solid orange;
+	background-color: transparent;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+[contenteditable="true"].state-ball {
+	color: green;
+    white-space: nowrap;
+    width:200px;
+    overflow: hidden;
+} 
+[contenteditable="true"].state-ball br {
+    display:none;
+
+}
+[contenteditable="true"].state-ball * {
+    display:inline;
+    white-space:nowrap;
+}

@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Simulator {{ x }}</title>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
+</head>
+<body>
+	<div class="container">
+		<div class="left-bar" id="left-bar">
+			<div class="left-bar-box" id="left-bar-box-1">
+				<form action="" method="POST" id="form">
+					{% csrf_token %}
+					<label for="testSample" class="left-bar-box-title">Test sample</label>
+					<input type="text" name="testSample" id="testSample">
+					<button type="submit">Test!</button>
+				</form>
+			</div>
+		</div>
+		<div class="canvas" id="canvas">
+			<div class="canvas" id="pressingCanvas"></div>
+		</div>
+	</div>
+</body>
+<footer>
+	<script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+	<script>
+		let statesData = (("{{ states }}").replace(/&(l|g|quo)t;/g, function(a,b){
+		        return {
+		            l   : '<',
+		            g   : '>',
+		            quo : '"'
+		        }[b];
+		    }));
+		statesData = statesData.replace(/u'/g, '\'');
+		statesData = statesData.replace(/'/g, '\"');
+		let states = JSON.parse(statesData);
+		startScript("{{ isNewSession }}", states);
+	</script>
+</footer>
+</html>
