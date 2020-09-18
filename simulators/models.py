@@ -15,6 +15,7 @@ class State(models.Model):
 	name = models.TextField(default='')
 	left = models.FloatField(default=0.0)
 	top = models.FloatField(default=0.0)
+	paths = models.ManyToManyField("self")
 	stateMachineOwner = models.ForeignKey(StateMachine, on_delete=models.CASCADE, null=True)
 	initialStateOf = models.OneToOneField(StateMachine, on_delete=models.CASCADE, related_name='initial_state_of', null=True, blank=True)
 	currentStateOf = models.OneToOneField(StateMachine, on_delete=models.CASCADE, related_name='current_state_of', null=True, blank=True)

@@ -1,13 +1,32 @@
 let diameter = 120;
 let innerDiameter = 100;
+let originX;
+let originY;
+let currentLine;
 let currentBall;
 let previousX;
 let previousY;
-let movingBall;
 let mayDragHorizontally = true;
+let isShifting = false;
+let isDrawingArrow = false;
 let mayDragVertically = true;
 let canvas = document.getElementById('canvas');
+let  pressingCanvas = document.getElementById('pressingCanvas');
 let leftBar = document.getElementById('left-bar');
+
+document.addEventListener('keydown', function(e) {
+    e = e || window.event;
+    if (e.key == 'Shift') {
+    	isShifting = true;
+    }
+});
+
+document.addEventListener('keyup', function(e) {
+	e = e || window.event;
+	if (e.key == 'Shift') {
+		isShifting = false;
+	}
+});
 
 // function for getting token for ajax call
 function getCookie(name) {
@@ -38,7 +57,6 @@ document.querySelector('form').addEventListener('submit', function(e) {
 	}
 	xhr.setRequestHeader('X-CSRFToken', csrftoken);
 	let data = new FormData();
-	console.log(document.getElementById('testSample').value);
 	data.append('testSample', document.getElementById('testSample').value);
 	xhr.send(data); //JSON.stringify
 });
@@ -50,15 +68,24 @@ function makeState(e, ballID, leftOffset, topOffset, htmlName, value) {
 		return;
 	}
 	let stateBall = document.createElement('div');
+	let ballTextDiv = document.createElement('div');
+	stateBall.appendChild(ballTextDiv);
 	stateBall.offsetParent = canvas;
 	stateBall.className = 'state-ball noselect';
-	stateBall.contentEditable = true;
+	ballTextDiv.className = 'noselect';
+	// stateBall.contentEditable = true;
+	ballTextDiv.contentEditable = true;
+	// stateBall.addEventListener('select', function(e) {
+		// console.log("but i know....");
+		// e.preventDefault();
+	// })
 	stateBall.id = 'state-ball-' + ballID;
-	stateBall.innerText = htmlName;
+	ballTextDiv.innerText = htmlName;
 	stateBall.addEventListener('mousedown', startDragging);
+	stateBall.addEventListener('mouseup', stopArrowState);
 	stateBall.addEventListener('dblclick', changeState);
-	stateBall.addEventListener('keydown', stopEditing);
-	stateBall.addEventListener('focusout', storeName);
+	ballTextDiv.addEventListener('keydown', stopEditing);
+	ballTextDiv.addEventListener('focusout', storeName);
 	stateBall.style.lineHeight = diameter + "px";
 	stateBall.style.height = diameter + "px";
 	stateBall.style.width = diameter + "px";
@@ -96,13 +123,13 @@ function removeState(id) {
 	xhr.send(data); //JSON.stringify
 }
 
-console.log("hiiii");
+console.log("no");
 
 function stopEditing(e) {
 	if (e.key == 'Enter' || e.key == 'Escape') {
 		this.blur();
 	} else if (e.key == 'Delete') {
-		removeState(this.id);
+		removeState(this.parentElement.id);
 	}
 }
 
@@ -141,7 +168,7 @@ function storeName() {
 	xhr.open('POST', "storeName/", true);
 	xhr.setRequestHeader('X-CSRFToken', csrftoken);
 	let data = new FormData();
-	data.append('id', this.id.substr(11));
+	data.append('id', this.parentElement.id.substr(11));
 	data.append('name', this.innerText);
 	xhr.send(data);
 }
@@ -153,7 +180,6 @@ function moveState(ball) {
 	xhr.setRequestHeader('X-CSRFToken', csrftoken);
 	let data = new FormData();
 	data.append('id', ball.id.substr(11));
-	console.log(ball.style.left);
 	data.append('leftOffset', parseInt(ball.style.left, 10));
 	data.append('topOffset', parseInt(ball.style.top, 10));
 	xhr.send(data);
@@ -197,18 +223,90 @@ function startScript(isNewSession, states) {
 	}
 }
 
-document.getElementById("pressingCanvas").addEventListener("dblclick", function(e) {
+// document.getElementById('canvas').ondblclick = function(e) {
+// 	console.log("plantilla");
+// }
+
+// document.getElementById("canvas").addEventListener("dblclick", function(e) {
+
+// 	console.log("new state");
+// 	e = e || window.event;
+// 	newState(false, e);
+// });
+
+pressingCanvas.addEventListener("dblclick", function(e) {
+	console.log("new state");
 	e = e || window.event;
 	newState(false, e);
 	// makeState(null, 4, e.clientX - diameter/2, e.clientY - diameter/2);
 });
 
-function startDragging(e) {
-	movingBall = this;
-	this.focus();
+function drawArrow(targetX, targetY) {
+	let distance = Math.sqrt( ((originX - targetX) * (originX - targetX)) + ((originY - targetY) * (originY - targetY)) );
+	let xMid = (originX + targetX) / 2;
+	let yMid = (originY + targetY) / 2;
+	let slope = Math.atan2(originY - targetY, originX - targetX) * 180 / Math.PI;
+	currentLine.style.width = distance + "px";
+	currentLine.style.left = (xMid - distance/2) + "px";
+	currentLine.style.top = yMid + "px";
+	currentLine.style.transform = "rotate("+slope+"deg)";
+}
+
+function dragArrow(e) {
 	e = e || window.event;
 	e.preventDefault();
-	currentBall = e.target || e.srcElement;
+	drawArrow(e.clientX, e.clientY);
+}
+
+function drawLine() {
+	isDrawingArrow = true;
+	let line = document.createElement('div');
+	line.className = 'connection-line';
+	let arrowBody = document.createElement('div');
+	arrowBody.className = 'arrow-body';
+	let head = document.createElement('div');
+	head.className = 'arrow-head';
+	line.appendChild(head);
+	line.appendChild(arrowBody);
+	let headImg = document.createElement('img');
+	headImg.src = arrowSrc;
+	head.appendChild(headImg);
+	// let img = document.createElement('img');
+	// img.className = 'arrow-img';/
+	// img.src = arrowSrc;
+	// line.appendChild(img);
+	// line.style.backgroundColor = "red";
+	// line.style.height = "10px";
+	// line.style.position = "absolute";
+	currentLine = line;
+	canvas.appendChild(line);
+	canvas.addEventListener('mousemove', dragArrow);
+}
+
+// let peter = document.createElement('div');
+// peter.style.height = "50px";
+// peter.style.width = "250px";
+// peter.style.backgroundColor = "red";
+// peter.style.position = "absolute";
+// peter.style.left = "350px";
+// peter.style.top = "100px";
+// canvas.appendChild(peter);
+
+function startDragging(e) {
+	e = e || window.event;
+	e.preventDefault();
+	console.log("cliked on sttae");
+	if (isShifting) {
+		console.log("started with the arrow");
+		originX = this.offsetLeft + diameter / 2;
+		originY = this.offsetTop + diameter / 2;
+		drawLine();
+		return;
+	}
+	// this.blur();
+	console.log("started dragging");
+	this.getElementsByClassName('noselect')[0].focus();
+	currentBall = this;
 	previousX = e.clientX;
 	previousY = e.clientY;
 	canvas.addEventListener('mousemove', doDragging);
@@ -231,8 +329,27 @@ function doDragging(e) {
 }
 
 function stopDragging(e) {
-	console.log("stopped raginggg");
-	moveState(movingBall);
+	moveState(currentBall);
 	canvas.removeEventListener('mousemove', doDragging);
 	document.removeEventListener('mouseup', stopDragging);
+}
+
+function stopArrowState(e) {
+	console.log("stopped on top of state");
+	if (isDrawingArrow) {
+		isDrawingArrow = false;
+		canvas.removeEventListener('mousemove', dragArrow);
+		drawArrow(this.offsetLeft + diameter / 2, this.offsetTop + diameter / 2); // might rebuild this whole thing, use onenter and shit, calculate accurate position like Evan
+	}
+}
+
+pressingCanvas.addEventListener('mouseup', stopArrowCanvas);
+
+function stopArrowCanvas(e) {
+	console.log("stopped on top of canvas");
+	if (isDrawingArrow) {
+		isDrawingArrow = false;
+		canvas.removeEventListener('mousemove', dragArrow);
+		currentLine.remove();
+	}
 }

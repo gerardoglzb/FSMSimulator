@@ -20,13 +20,14 @@
 			</div>
 		</div>
 		<div class="canvas" id="canvas">
-			<div class="canvas" id="pressingCanvas"></div>
+			<div class="pressingCanvas" id="pressingCanvas"></div>
 		</div>
 	</div>
 </body>
 <footer>
 	<script type="text/javascript" src="{% static 'js/script.js' %}"></script>
 	<script>
+		let arrowSrc = "{% static 'images/arrow_head.png' %}";
 		let statesData = (("{{ states }}").replace(/&(l|g|quo)t;/g, function(a,b){
 		        return {
 		            l   : '<',

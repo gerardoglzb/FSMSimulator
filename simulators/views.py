@@ -66,45 +66,67 @@ def something(request): #change name, refers to the state creation
 def storeName(request):
 	unloggedUser = UnloggedUser.objects.get(userID=request.session['key'])
 	stateMachine = StateMachine.objects.get(unloggedUser=unloggedUser)
-	state = State.objects.get(pk=request.POST['id'])
-	state.name = request.POST['name']
-	state.save()
+	try:
+		state = State.objects.get(stateMachineOwner=stateMachine, pk=request.POST['id'])
+	except State.DoesNotExist:
+		state = None
+	if state:
+		state.name = request.POST['name']
+		state.save()
 	return HttpResponse()
 
 def removeState(request):
 	unloggedUser = UnloggedUser.objects.get(userID=request.session['key'])
 	stateMachine = StateMachine.objects.get(unloggedUser=unloggedUser)
-	state = State.objects.get(pk=request.POST['id'])
-	state.delete()
+	try:
+		state = State.objects.get(stateMachineOwner=stateMachine, pk=request.POST['id'])
+	except State.DoesNotExist:
+		state = None
+	if state:
+		state.delete()
 	return HttpResponse()
 
 
 def changeState(request):
 	unloggedUser = UnloggedUser.objects.get(userID=request.session['key'])
 	stateMachine = StateMachine.objects.get(unloggedUser=unloggedUser)
-	state = State.objects.get(pk=request.POST['id'])
-	print("found the right one")
-	if request.POST['isFalse'] == 'true':
-		print("changed to true")
-		state.value = True
-	else:
-		state.value = False
-	state.save()
+	try:
+		state = State.objects.get(stateMachineOwner=stateMachine, pk=request.POST['id'])
+	except State.DoesNotExist:
+		state = None
+	if state:
+		if request.POST['isFalse'] == 'true':
+			print("changed to true")
+			state.value = True
+		else:
+			state.value = False
+		state.save()
 	return HttpResponse()
 
 def moveState(request):
 	unloggedUser = UnloggedUser.objects.get(userID=request.session['key'])
 	stateMachine = StateMachine.objects.get(unloggedUser=unloggedUser)
-	state = State.objects.get(pk=request.POST['id'])
-	state.left = request.POST['leftOffset']
-	state.top = request.POST['topOffset']
-	state.save()
+	try:
+		state = State.objects.get(stateMachineOwner=stateMachine, pk=request.POST['id'])
+	except State.DoesNotExist:
+		state = None
+	if state:
+		state.left = request.POST['leftOffset']
+		state.top = request.POST['topOffset']
+		state.save()
+		print("Moving successful.")
+	else:
+		print("Moving failed client-side.")
 	return HttpResponse()
 
 def testSample(request):
 	print('SAMPLIIIIIING')
+	unloggedUser = UnloggedUser.objects.get(userID=request.session['key'])
+	stateMachine = StateMachine.objects.get(unloggedUser=unloggedUser)
+	states = State.objects.filter(stateMachineOwner=stateMachine)
+	sm = SM.StateMachine()
 	print(request.POST['testSample'])
-	return HttpResponse('hey')
+	return HttpResponse()
 
 
 '''
