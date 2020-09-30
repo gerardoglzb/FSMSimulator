@@ -15,10 +15,15 @@ class State(models.Model):
 	name = models.TextField(default='')
 	left = models.FloatField(default=0.0)
 	top = models.FloatField(default=0.0)
-	paths = models.ManyToManyField("self")
+	paths = models.ManyToManyField('self', through='Connection')
 	stateMachineOwner = models.ForeignKey(StateMachine, on_delete=models.CASCADE, null=True)
 	initialStateOf = models.OneToOneField(StateMachine, on_delete=models.CASCADE, related_name='initial_state_of', null=True, blank=True)
 	currentStateOf = models.OneToOneField(StateMachine, on_delete=models.CASCADE, related_name='current_state_of', null=True, blank=True)
+
+class Connection(models.Model):
+	origin = models.ForeignKey(State, related_name='origin_state', on_delete=models.CASCADE)
+	target = models.ForeignKey(State, related_name='target_state', on_delete=models.CASCADE)
+	transition = models.CharField(max_length=64, default='')
 
 
 

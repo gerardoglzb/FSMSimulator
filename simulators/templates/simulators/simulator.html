@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Simulator {{ x }}</title>
+	<title>Simulator</title>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;900&display=swap" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}">
 </head>
@@ -11,23 +11,62 @@
 	<div class="container">
 		<div class="left-bar" id="left-bar">
 			<div class="left-bar-box" id="left-bar-box-1">
-				<form action="" method="POST" id="form">
-					{% csrf_token %}
-					<label for="testSample" class="left-bar-box-title">Test sample</label>
-					<input type="text" name="testSample" id="testSample">
-					<button type="submit">Test!</button>
+				<form action="" method="POST" id="test-form">
+					<label for="test-sample" class="left-bar-box-title">Test sample</label>
+					<input type="text" name="test-sample" id="test-sample">
+					<button type="submit" id="test-btn">Test!</button>
 				</form>
+			</div>
+			<br>
+			<div class="left-bar-box" id="left-bar-box-2">
+				<div class="response-box" id="response-box"></div>
+			</div>
+			<br>
+			<div class="left-bar-box" id="left-bar-box-3">
+				<form action="" class="multi-test-form" method="POST" id="multi-test-form">
+					<label class="left-bar-box-title">Test sample</label>
+					<button type="submit" id="multi-test-btn">Test!</button>
+					<br>
+					<label class="left-bar-box-subtitle">Accept</label>
+					<textarea class="multi-test-sample" rows=10 name="multi-test-sample-positive" id="multi-test-sample-positive"></textarea>
+					<label class="left-bar-box-subtitle">Reject</label>
+					<textarea class="multi-test-sample" rows=10 name="multi-test-sample-negative" id="multi-test-sample-negative"></textarea>
+				</form>
+			</div>
+			<br>
+			<div class="left-bar-box" id="left-bar-box-4">
+				<div class="multi-response-box" id="multi-response-box"></div>
 			</div>
 		</div>
 		<div class="canvas" id="canvas">
 			<div class="pressingCanvas" id="pressingCanvas"></div>
 		</div>
 	</div>
+	<div class="modal" id="connection-modal">
+		<div class="modal-content">
+			<p class="modal-title">Set Transition Character:</p>
+			<div class="modal-row">
+				<input type="text" name="connection-input" id="connection-input" class="modal-input">
+			</div>
+			<div class="modal-row">
+				<button class="modal-button" id="cancel-model">Cancel</button>
+				<button class="modal-button" id="accept-model">Accept</button>
+			</div>
+		</div>
+	</div>
 </body>
 <footer>
 	<script type="text/javascript" src="{% static 'js/script.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/Connection.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/setup.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/tests.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/transitions.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/arrows.js' %}"></script>
+	<script type="text/javascript" src="{% static 'js/states.js' %}"></script>
 	<script>
-		let arrowSrc = "{% static 'images/arrow_head.png' %}";
+		let blackArrowSrc = "{% static 'images/black_arrow_head.png' %}";
+		let blueArrowSrc = "{% static 'images/blue_arrow_head.png' %}";
+		let blackPointSrc = "{% static 'images/black_arrow_head_point.png' %}";
 		let statesData = (("{{ states }}").replace(/&(l|g|quo)t;/g, function(a,b){
 		        return {
 		            l   : '<',
@@ -37,8 +76,19 @@
 		    }));
 		statesData = statesData.replace(/u'/g, '\'');
 		statesData = statesData.replace(/'/g, '\"');
+		let connectionsData = (("{{ connections }}").replace(/&(l|g|quo)t;/g, function(a,b){
+		        return {
+		            l   : '<',
+		            g   : '>',
+		            quo : '"'
+		        }[b];
+		    }));
+		connectionsData = connectionsData.replace(/u'/g, '\'');
+		connectionsData = connectionsData.replace(/'/g, '\"');
 		let states = JSON.parse(statesData);
-		startScript("{{ isNewSession }}", states);
+		let initialStateID = "{{ initialStateID }}";
+		let connections = JSON.parse(connectionsData);
+		startScript("{{ isNewSession }}", states, connections);
 	</script>
 </footer>
 </html>
