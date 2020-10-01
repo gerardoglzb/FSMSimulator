@@ -17,10 +17,24 @@ function moveCircle(circle, originB) {
 
 function drawMainArrow(targetX, targetY) {
 	let slope = drawArrow(currentLine, originBall.offsetLeft + diameter / 2, originBall.offsetTop + diameter / 2, targetX, targetY);
-	currentLine.getElementsByClassName('arrow-head-img')[0].src = blackArrowSrc;
-	currentLine.getElementsByClassName('arrow-body')[0].style.width = "calc(100% - 83px)";
-	currentLine.getElementsByClassName('arrow-head')[0].style.width = "83px";
+	currentLine.getElementsByClassName('arrow-head-img')[0].src = blackPointSrc;
+	// currentLine.getElementsByClassName('arrow-body')[0].style.width = "calc(100% - 83px)";
+	// currentLine.getElementsByClassName('arrow-head')[0].style.width = "83px";
 	return slope;
+}
+
+function secondArrow(path, transition, angle) {
+	currentLine = path;
+	makeTransitionText(currentLine, transition, angle, false, true);
+	let secondArrowHead = document.createElement('div');
+	secondArrowHead.className = 'arrow-head second-arrow-head';
+	let secondHeadImg = document.createElement('img');
+	secondHeadImg.className = 'arrow-head-img';
+	secondHeadImg.setAttribute('draggable', false);
+	secondHeadImg.src = redArrowSrc;
+	secondArrowHead.append(secondHeadImg);
+	currentLine.getElementsByClassName('arrow-body')[0].style.width = 'calc(100% - 60px)';
+	currentLine.append(secondArrowHead);
 }
 
 function dragArrow(e) {
@@ -29,8 +43,8 @@ function dragArrow(e) {
 	if (!arrowInState) {
 		drawArrow(currentLine, originBall.offsetLeft + diameter / 2, originBall.offsetTop + diameter / 2, e.clientX, e.clientY);
 		currentLine.getElementsByClassName('arrow-head-img')[0].src = blackPointSrc;
-		currentLine.getElementsByClassName('arrow-body')[0].style.width = "calc(100% - 30px)";
-		currentLine.getElementsByClassName('arrow-head')[0].style.width = "30px";
+		// currentLine.getElementsByClassName('arrow-body')[0].style.width = "calc(100% - 30px)";
+		// currentLine.getElementsByClassName('arrow-head')[0].style.width = "30px";
 	}
 }
 
@@ -57,7 +71,7 @@ function changeLineColor(line, color) {
 	if (arrowBodies.length > 0) {
 		arrowBodies[0].style.backgroundColor = color;
 		if (color == 'black') {
-			line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blackArrowSrc;
+			line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blackPointSrc;
 		} else {
 			line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blueArrowSrc;
 		}
@@ -123,7 +137,7 @@ function drawLine() {
 }
 
 function drawArrow(line, originX, originY, targetX, targetY) {
-	let distance = Math.sqrt( ((originX - targetX) * (originX - targetX)) + ((originY - targetY) * (originY - targetY)) );
+	let distance = Math.sqrt( ((originX - targetX) * (originX - targetX)) + ((originY - targetY) * (originY - targetY)) ) - diameter;
 	let xMid = (originX + targetX) / 2;
 	let yMid = (originY + targetY) / 2;
 	let slope = Math.atan2(originY - targetY, originX - targetX) * 180 / Math.PI;
@@ -165,7 +179,7 @@ function changeLine(tb, textDiv, txt) {
 	xhr.send(data);
 }
 
-function storeLine(tb, l, txt, initializeTransitions) {
+function storeLine(tb, l, txt, initializeTransitions, reverseConnection) {
 	const csrftoken = getCookie('csrftoken');
 	let xhr = new XMLHttpRequest();
 	xhr.open('POST', "storeLine/", true);
@@ -179,32 +193,42 @@ function storeLine(tb, l, txt, initializeTransitions) {
 				}
 				if (tb == originBall) {
 					let lConnections = localConnections[originBall.id];
-					let hasCircleConnections = false;
+					let circleIndex = null;
 					for (let i = 0; i < lConnections.length; i++) {
 						if (lConnections[i].target == tb) {
-							hasCircleConnections = true;
+							circleIndex = i;
 							break;
 						}
 					}
-					if (!hasCircleConnections) {
-						localConnections[originBall.id].push(new Connection(tb, l, [this.responseText], ));
+					if (circleIndex == null) {
+						localConnections[originBall.id].push(new Connection(tb, l, [this.responseText], 0, false));
 						l.id = 'line-' + originBall.id.substr(11) + '-' + tb.id.substr(11);
 						makeTransitionContainer(l, txt, 0, true);
 					} else {
-						makeTransitionText(circleConnections[0], txt, 0);
+						makeTransitionText(lConnections[circleIndex].path, txt, 0, true, false);
+						l.remove();
 					}
 					return;
 				}
 				if (initializeTransitions) {
-					localConnections[originBall.id].push(new Connection(tb, l, [this.responseText], ));
+					localConnections[originBall.id].push(new Connection(tb, l, [this.responseText], currentSlope, false));
 					l.id = 'line-' + originBall.id.substr(11) + '-' + tb.id.substr(11);
 					makeTransitionContainer(l, txt, currentSlope, false);
+				} else if (reverseConnection) {
+					let lConnections = localConnections[tb.id];
+					for (let i = 0; i < lConnections.length; i++) {
+						if (lConnections[i].target == originBall) {
+							localConnections[tb.id][i].transitions.push(this.responseText);
+							makeTransitionText(localConnections[tb.id][i].path, txt, currentSlope, false, true);
+							break;
+						}
+					}
 				} else {
 					let lConnections = localConnections[originBall.id];
 					for (let i = 0; i < lConnections.length; i++) {
 						if (lConnections[i].target == tb) {
 							localConnections[originBall.id][i].transitions.push(this.responseText);
-							makeTransitionText(localConnections[originBall.id][i].path, txt, currentSlope);
+							makeTransitionText(localConnections[originBall.id][i].path, txt, currentSlope, false);
 							break;
 						}
 					}
@@ -269,8 +293,8 @@ function startDragging(e) {
 	previousX = e.clientX;
 	previousY = e.clientY
 	let lines = document.getElementsByClassName('connection-line');
-	from = [];
-	to = [];
+	from = {}; //[];
+	to = {}; //[];
 	let thisId = this.id.substr(11);
 	for (let i = 0; i < lines.length; i++) {
 		let splitLine = lines[i].id.split('-');
@@ -335,8 +359,8 @@ function stopDragging(e) {
 	moveState(currentBall);
 	canvas.removeEventListener('mousemove', doDragging);
 	document.removeEventListener('mouseup', stopDragging);
-	from = {};
-	to = {};
+	// from = {};
+	// to = {};
 }
 
 function stopArrowState(e) {
@@ -347,37 +371,54 @@ function stopArrowState(e) {
 			if (currentLine.className != 'connection-circle') {
 				alert("Getting here");
 				makeCircle(this);
-				openConnectionBox(false, true);
+				openConnectionBox(false, true, false);
 				targetBall = this;
 			} else {
-				openConnectionBox(true, true);
+				openConnectionBox(true, true, false);
 			}
 			return;
 		} else {
 			canvas.removeEventListener('mousemove', dragArrow);
 			let lineFound = false;
-			if (localConnections[originBall.id]) {
+			let reverseLineFound = false;
+			if (localConnections[originBall.id]) { // use tos here
 				let lConnections = localConnections[originBall.id];
 				for (let i = 0; i < lConnections.length; i++) {
-					if (lConnections[i].target == this) {
+					if (lConnections[i].target == this && !lConnections[i].isReversed) {
 						lineFound = true;
 						break;
 					}
 				}
 			}
-			targetBall = this;
 			if (!lineFound) {
+				// see if there's one from here to the other side
+				if (localConnections[this.id]) {
+					let lConnections = localConnections[this.id];
+					for (let i = 0; i < lConnections.length; i++) {
+						if (lConnections[i].target == originBall) {
+							reverseLineFound = true;
+							break;
+						}
+					}
+				}
+			}
+			targetBall = this;
+			if (!lineFound && !reverseLineFound) {
 				currentSlope = drawMainArrow(this.offsetLeft + diameter / 2, this.offsetTop + diameter / 2);
-				openConnectionBox(true, true);
+				openConnectionBox(true, true, false);
+				return;
+			}
+			if (reverseLineFound) {
+				// reverse stuff
+				currentLine.remove();
+				openConnectionBox(false, true, true);
 				return;
 			}
 			currentLine.remove();
 		}
-		openConnectionBox(false, true);
+		openConnectionBox(false, true, false);
 	}
 }
-
-pressingCanvas.addEventListener('mouseup', stopArrowCanvas);
 
 function stopArrowCanvas(e) {
 	if (isDrawingArrow) {
@@ -405,3 +446,5 @@ function leaveState(e) {
 		arrowInState = false;
 	}
 }
+
+pressingCanvas.addEventListener('mouseup', stopArrowCanvas);

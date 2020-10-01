@@ -218,6 +218,8 @@ def removeLine(request):
 
 @csrf_exempt
 def removeText(request):
+	print("removing")
+	print("PATHO:", request.POST['oldPath'])
 	unloggedUser = UnloggedUser.objects.get(userID=request.session['key'])
 	stateMachine = StateMachine.objects.get(unloggedUser=unloggedUser)
 	try:
@@ -230,6 +232,7 @@ def removeText(request):
 		targetState = None
 	if originState and targetState:
 		try:
+			print("PATHO:", request.POST['oldPath'])
 			Connection.objects.all().get(origin=originState, target=targetState, transition=request.POST['oldPath']).delete()
 		except Connection.DoesNotExist:
 			return HttpResponse('0')

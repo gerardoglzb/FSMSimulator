@@ -23,9 +23,9 @@
 
 * [About the Project](#about-the-project)
   * [Built With](#built-with)
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
+<!-- * [Getting Started](#getting-started) -->
+  <!-- * [Prerequisites](#prerequisites) -->
+  <!-- * [Installation](#installation) -->
 * [Usage](#usage)
 * [Contributing](#contributing)
 * [License](#license)
@@ -95,4 +95,4 @@ Project Link: [https://github.com/gerardoglzb/FSMSimulator](https://github.com/g
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[product-screenshot]: imgs/screenshot.png
+<!-- [product-screenshot]: imgs/screenshot.png -->

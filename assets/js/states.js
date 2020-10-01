@@ -34,7 +34,7 @@ function makeState(e, ballID, leftOffset, topOffset, htmlName, value, isInitial)
 	innerBall.style.height = innerDiameter + 'px';
 	innerBall.style.width = innerDiameter + 'px';
 	if (value) {
-		innerBall.style.borderColor = 'red';
+		innerBall.style.borderColor = '#AD343E';
 	} else {
 		innerBall.style.borderColor = 'transparent';
 	}
@@ -107,7 +107,7 @@ function removeState(id) {
 
 function changeVisualState(id, isFalse) {
 	if (isFalse) {
-		document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor = '#FB8F67';
+		document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor = '#AD343E';
 	} else {
 		document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor = 'transparent';
 	}
@@ -116,7 +116,8 @@ function changeVisualState(id, isFalse) {
 function changeState(e) {
 	let id = this.id;
 	let isFalse = true;
-	if (document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor == '#FB8F67') {
+	// alert(document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor);
+	if (document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor == 'rgb(173, 52, 62)') {
 		isFalse = false;
 	}
 	const csrftoken = getCookie('csrftoken');

@@ -2,14 +2,18 @@ function makeTransitionContainer(line, txt, lineAngle, isCircle) {
 	let tContainer = document.createElement('div');
 	tContainer.className = 'line-container';
 	line.append(tContainer);
-	makeTransitionText(line, txt, lineAngle, isCircle);
+	makeTransitionText(line, txt, lineAngle, isCircle, false);
 }
 
-function makeTransitionText(line, txt, lineAngle, isCircle) {
+function makeTransitionText(line, txt, lineAngle, isCircle, isReversed) {
 	let tText = document.createElement('div');
 	tText.className = 'line-text';
 	tText.innerText = txt;
 	let lineContainer = line.getElementsByClassName('line-container')[0];
+	if (isReversed) {
+		// alert("colrin");
+		tText.style.backgroundColor = '#AD343E';
+	}
 	lineContainer.append(tText);
 	if (isCircle) {
 		let textCount = lineContainer.getElementsByClassName('line-text').length;
@@ -35,8 +39,10 @@ function addTransitionContainer(line, lineAngle) {
 }
 
 function deleteText() {
-	let line = selectedText.parentElement.parentElement;
+	let container = selectedText.parentElement;
+	let line = container.parentElement;
 	let counter = 0;
+	let reverseCounter = 0;
 	for (let i = 0; i < localConnections[originBall.id].length; i++) {
 		if (localConnections[originBall.id][i].target == targetBall) {
 			if (localConnections[originBall.id][i].transition == selectedText.innerText) {
@@ -46,10 +52,23 @@ function deleteText() {
 			}
 		}
 	}
-	if (counter == 0) {
+	let containerTexts = container.getElementsByClassName('line-text');
+	for (let i = 0; i < containerTexts.length; i++) {
+		if (containerTexts[i].style.backgroundColor == 'rgb(173, 52, 62)') {
+			reverseCounter++;
+			break;
+		}
+	}
+	if (counter == 0 && reverseCounter == 0) {
 		line.remove();
+	} else if (reverseCounter == 0) {
+		selectedText.remove();
+		line.getElementsByClassName('second-arrow-head')[0].remove();
+		currentLine.getElementsByClassName('arrow-body')[0].style.width = 'calc(100% - 30px)';
 	} else {
 		selectedText.remove();
+		let textCount = container.getElementsByClassName('line-text').length;
+		container.style.top = (-20 * textCount) + 'px';
 		unselectText(line);
 	}
 	hideModel();
@@ -70,8 +89,15 @@ function removeText() {
 	}
 	xhr.setRequestHeader('X-CSRFToken', csrftoken);
 	let data = new FormData();
-	data.append('originBall', originBall.id.substr(11));
-	data.append('targetBall', targetBall.id.substr(11));
+	let originID = originBall.id.substr(11);
+	let targetID = targetBall.id.substr(11);
+	if (selectedText.style.backgroundColor == 'rgb(173, 52, 62)') {
+		let temp = originID;
+		originID = targetID;
+		targetID = temp;
+	}
+	data.append('originBall', originID);
+	data.append('targetBall', targetID);
 	data.append('oldPath', selectedText.innerText);
 	xhr.send(data);
 }
@@ -92,7 +118,7 @@ function acceptModel() {
 	if (isNewConnection) {
 		storeLine(targetBall, currentLine, connectionInput.value, true);
 	} else if (isAnotherConnection) {
-		storeLine(targetBall, currentLine, connectionInput.value, false);
+		storeLine(targetBall, currentLine, connectionInput.value, false, isReversedConnection);
 	} else {
 		changeLine(targetBall, selectedText, connectionInput.value);
 	}
@@ -123,17 +149,18 @@ function connectionBoxKeyController(e) {
 	} else if (e.key == 'Enter') {
 		acceptModel();
 	} else if (!isNewConnection && e.key == 'Delete') {
-		removeText();
+		removeText(); // when going the other way, make sure to switch target and origin in python and jscript
 	}
 }
 
-function openConnectionBox(newConnection, anotherConnection) {
+function openConnectionBox(newConnection, anotherConnection, reversedConnection) {
 	modal.style.display = "block";
 	isNewConnection = newConnection;
 	if (selectedText) {
 		connectionInput.value = selectedText.innerText;
 	}
 	isAnotherConnection = anotherConnection;
+	isReversedConnection = reversedConnection;
 	acceptBtn.addEventListener('click', acceptModel);
 	cancelBtn.addEventListener('click', cancelModel);
 	connectionInput.addEventListener('keydown', connectionBoxKeyController);

@@ -142,6 +142,12 @@ body {
 	background-color: #FB8F67;
 }
 
+.second-arrow-head {
+	position: absolute;
+	margin-left: calc(100% - 30px);
+	z-index: 10;
+}
+
 .connection-circle {
 	z-index: 0;
 	cursor: pointer;
