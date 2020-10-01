@@ -7,6 +7,7 @@ let currentOriginY;
 let from = {};
 let to = [];
 let isNewConnection;
+let isReversedConnection;
 let targetBall;
 let currentLine;
 let selectedText;

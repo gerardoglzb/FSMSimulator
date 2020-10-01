@@ -107,7 +107,7 @@ function removeState(id) {
 
 function changeVisualState(id, isFalse) {
 	if (isFalse) {
-		document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor = 'orange';
+		document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor = '#FB8F67';
 	} else {
 		document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor = 'transparent';
 	}
@@ -116,7 +116,7 @@ function changeVisualState(id, isFalse) {
 function changeState(e) {
 	let id = this.id;
 	let isFalse = true;
-	if (document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor == 'orange') {
+	if (document.getElementById(id).getElementsByClassName('inner-ball')[0].style.borderColor == '#FB8F67') {
 		isFalse = false;
 	}
 	const csrftoken = getCookie('csrftoken');

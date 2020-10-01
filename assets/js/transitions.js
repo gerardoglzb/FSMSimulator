@@ -1,15 +1,20 @@
-function makeTransitionContainer(line, txt, lineAngle) {
+function makeTransitionContainer(line, txt, lineAngle, isCircle) {
 	let tContainer = document.createElement('div');
 	tContainer.className = 'line-container';
 	line.append(tContainer);
-	makeTransitionText(line, txt, lineAngle);
+	makeTransitionText(line, txt, lineAngle, isCircle);
 }
 
-function makeTransitionText(line, txt, lineAngle) {
+function makeTransitionText(line, txt, lineAngle, isCircle) {
 	let tText = document.createElement('div');
 	tText.className = 'line-text';
 	tText.innerText = txt;
-	line.getElementsByClassName('line-container')[0].append(tText);
+	let lineContainer = line.getElementsByClassName('line-container')[0];
+	lineContainer.append(tText);
+	if (isCircle) {
+		let textCount = lineContainer.getElementsByClassName('line-text').length;
+		lineContainer.style.top = (-20 * textCount) + 'px';
+	}
 	addFunctionalityToLine(currentLine, tText);
 	addTransitionContainer(line, lineAngle);
 }
@@ -34,7 +39,7 @@ function deleteText() {
 	let counter = 0;
 	for (let i = 0; i < localConnections[originBall.id].length; i++) {
 		if (localConnections[originBall.id][i].target == targetBall) {
-			if (localConnections[originBall.id][i].path == line) {
+			if (localConnections[originBall.id][i].transition == selectedText.innerText) {
 				localConnections[originBall.id].splice(i, 1);
 			} else {
 				counter++;
@@ -45,6 +50,7 @@ function deleteText() {
 		line.remove();
 	} else {
 		selectedText.remove();
+		unselectText(line);
 	}
 	hideModel();
 }
@@ -74,7 +80,6 @@ function showModel() {
 	modal.style.display = 'none';
 }
 
-console.log("esconde");
 function acceptModel() {
 	if (/\s/g.test(connectionInput.value)) {
 		alert("You can't use white spaces.");
@@ -85,13 +90,10 @@ function acceptModel() {
 		return;
 	}
 	if (isNewConnection) {
-		console.log("new con");
 		storeLine(targetBall, currentLine, connectionInput.value, true);
 	} else if (isAnotherConnection) {
-		console.log("another con");
 		storeLine(targetBall, currentLine, connectionInput.value, false);
 	} else {
-		console.log("change line");
 		changeLine(targetBall, selectedText, connectionInput.value);
 	}
 	hideModel();

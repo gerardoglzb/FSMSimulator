@@ -10,6 +10,11 @@ function moveArrow(line, originB, targetB) {
 	}
 }
 
+function moveCircle(circle, originB) {
+	circle.style.top = (originB.offsetTop - circleDiameter / 2) + 'px';
+	circle.style.left = (originB.offsetLeft + diameter / 2 - circleDiameter / 2 - 5) + 'px';
+}
+
 function drawMainArrow(targetX, targetY) {
 	let slope = drawArrow(currentLine, originBall.offsetLeft + diameter / 2, originBall.offsetTop + diameter / 2, targetX, targetY);
 	currentLine.getElementsByClassName('arrow-head-img')[0].src = blackArrowSrc;
@@ -38,19 +43,26 @@ function activateArrow(e) {
 	drawLine();
 }
 
-function unselectText() {
+function unselectText(line) {
 	if (selectedText.parentElement) {
 		changeLineColor(selectedText.parentElement.parentElement, "black");
+	} else if (line) {
+		changeLineColor(line, "black");
 	}
 	selectedText = null;
 }
 
 function changeLineColor(line, color) {
-	line.getElementsByClassName('arrow-body')[0].style.backgroundColor = color;
-	if (color == 'black') {
-		line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blackArrowSrc;
+	let arrowBodies = line.getElementsByClassName('arrow-body');
+	if (arrowBodies.length > 0) {
+		arrowBodies[0].style.backgroundColor = color;
+		if (color == 'black') {
+			line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blackArrowSrc;
+		} else {
+			line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blueArrowSrc;
+		}
 	} else {
-		line.getElementsByClassName('arrow-head')[0].getElementsByClassName('arrow-head-img')[0].src = blueArrowSrc;
+		line.style.borderColor = color;
 	}
 }
 
@@ -77,11 +89,13 @@ function makeCircle(state) {
 	circle.className = 'connection-circle';
 	circle.style.height = circleDiameter + 'px';
 	circle.style.width = circleDiameter + 'px';
-	// circle.style.top = (state.offsetTop - circleDiameter / 2) + 'px';
-	// circle.style.left = (state.offsetLeft + diameter / 2 - circleDiameter / 2 - 5) + 'px';
+	circle.style.top = (state.offsetTop - circleDiameter / 2) + 'px';
+	circle.style.left = (state.offsetLeft + diameter / 2 - circleDiameter / 2 - 5) + 'px';
+	// circle.style.bottom = (diameter - circleDiameter / 2 - 5) + 'px';
+	// circle.style.left = (diameter / 2 - circleDiameter / 2 - 10) + 'px';
 	currentLine = circle;
 	targetBall = state;
-	state.appendChild(circle);
+	canvas.appendChild(circle);
 }
 
 function makeLine() {
@@ -164,12 +178,18 @@ function storeLine(tb, l, txt, initializeTransitions) {
 					localConnections[originBall.id] = [];
 				}
 				if (tb == originBall) {
-					console.log("same same");
-					let circleConnections = tb.getElementsByClassName('connection-circle');
-					if (circleConnections.length == 0) {
+					let lConnections = localConnections[originBall.id];
+					let hasCircleConnections = false;
+					for (let i = 0; i < lConnections.length; i++) {
+						if (lConnections[i].target == tb) {
+							hasCircleConnections = true;
+							break;
+						}
+					}
+					if (!hasCircleConnections) {
 						localConnections[originBall.id].push(new Connection(tb, l, [this.responseText], ));
 						l.id = 'line-' + originBall.id.substr(11) + '-' + tb.id.substr(11);
-						makeTransitionContainer(l, txt, 0);
+						makeTransitionContainer(l, txt, 0, true);
 					} else {
 						makeTransitionText(circleConnections[0], txt, 0);
 					}
@@ -178,7 +198,7 @@ function storeLine(tb, l, txt, initializeTransitions) {
 				if (initializeTransitions) {
 					localConnections[originBall.id].push(new Connection(tb, l, [this.responseText], ));
 					l.id = 'line-' + originBall.id.substr(11) + '-' + tb.id.substr(11);
-					makeTransitionContainer(l, txt, currentSlope);
+					makeTransitionContainer(l, txt, currentSlope, false);
 				} else {
 					let lConnections = localConnections[originBall.id];
 					for (let i = 0; i < lConnections.length; i++) {
@@ -232,7 +252,6 @@ function startDragging(e) {
 	e.preventDefault();
 	if (e.shiftKey) {
 		isDrawingArrow = true;
-		console.log("my boy be out here shiftin");
 		makeCircle(this);
 		originBall = this;
 		this.addEventListener('mouseleave', activateArrow);
@@ -301,6 +320,11 @@ function doDragging(e) {
 		let tBall = document.getElementById('state-ball-' + t);
 		moveArrow(to[t], tBall, currentBall);
 	}
+	let circleID = currentBall.id.substr(11);
+	let circleConnection = document.getElementById('line-' + circleID + '-' + circleID);
+	if (circleConnection) {
+		moveCircle(circleConnection, currentBall);
+	}
 }
 
 function stopDragging(e) {
@@ -315,7 +339,6 @@ function stopDragging(e) {
 	to = {};
 }
 
-console.log("pls)");
 function stopArrowState(e) {
 	this.removeEventListener('mouseleave', activateArrow);
 	if (isDrawingArrow) {
@@ -324,10 +347,12 @@ function stopArrowState(e) {
 			if (currentLine.className != 'connection-circle') {
 				alert("Getting here");
 				makeCircle(this);
-				openConnectionBox(true, true);
+				openConnectionBox(false, true);
 				targetBall = this;
-				return;
+			} else {
+				openConnectionBox(true, true);
 			}
+			return;
 		} else {
 			canvas.removeEventListener('mousemove', dragArrow);
 			let lineFound = false;
@@ -346,9 +371,8 @@ function stopArrowState(e) {
 				openConnectionBox(true, true);
 				return;
 			}
+			currentLine.remove();
 		}
-		alert("gay)");
-		currentLine.remove();
 		openConnectionBox(false, true);
 	}
 }

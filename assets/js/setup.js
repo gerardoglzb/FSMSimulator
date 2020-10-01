@@ -8,10 +8,16 @@ function restoreMachine(states, connections) {
 		originBall = document.getElementById(originId);
 		let tempTargetBall = document.getElementById(targetId);
 		if (!localConnections[originBall.id]) {
-			makeLine();
-			let slope = drawMainArrow(tempTargetBall.offsetLeft + diameter / 2, tempTargetBall.offsetTop + diameter / 2);
+			let slope = 0;
+			if (originBall == tempTargetBall) {
+				makeCircle(originBall);
+				makeTransitionContainer(currentLine, connections[i].fields.transition, slope, true);
+			} else {
+				makeLine();
+				slope = drawMainArrow(tempTargetBall.offsetLeft + diameter / 2, tempTargetBall.offsetTop + diameter / 2);
+				makeTransitionContainer(currentLine, connections[i].fields.transition, slope, false);
+			}
 			currentLine.id = 'line-' + originBall.id.substr(11) + '-' + tempTargetBall.id.substr(11);
-			makeTransitionContainer(currentLine, connections[i].fields.transition, slope);
 			localConnections[originBall.id] = [];
 			localConnections[originBall.id].push(new Connection(tempTargetBall, currentLine, [connections[i].fields.transition], slope));
 		} else {
@@ -24,13 +30,19 @@ function restoreMachine(states, connections) {
 			}
 			if (lineIndex != null) {
 				currentLine = localConnections[originBall.id][lineIndex].path;
-				makeTransitionText(currentLine, connections[i].fields.transition, localConnections[originBall.id][lineIndex].angle);
+				makeTransitionText(currentLine, connections[i].fields.transition, localConnections[originBall.id][lineIndex].angle, currentLine.className == 'connection-circle');
 				localConnections[originBall.id][lineIndex].transitions.push(connections[i].fields.transition);
 			} else {
-				makeLine();
-				let slope = drawMainArrow(tempTargetBall.offsetLeft + diameter / 2, tempTargetBall.offsetTop + diameter / 2);
+				let slope = 0;
+				if (originBall == tempTargetBall) {
+					makeCircle(originBall);
+					makeTransitionContainer(currentLine, connections[i].fields.transition, slope, true);
+				} else {
+					makeLine();
+					slope = drawMainArrow(tempTargetBall.offsetLeft + diameter / 2, tempTargetBall.offsetTop + diameter / 2);
+					makeTransitionContainer(currentLine, connections[i].fields.transition, slope, false);
+				}
 				currentLine.id = 'line-' + originBall.id.substr(11) + '-' + tempTargetBall.id.substr(11);
-				makeTransitionContainer(currentLine, connections[i].fields.transition, slope);
 				localConnections[originBall.id].push(new Connection(tempTargetBall, currentLine, [connections[i].fields.transition], slope));
 			}
 		}
