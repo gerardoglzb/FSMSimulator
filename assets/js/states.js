@@ -68,8 +68,6 @@ function changeInitialState(id) {
 	xhr.send(data);
 }
 
-// if initial state gets deleted, then change initial state, if there aren't anymore states, create one or... prevent deletion actually...
-// also make sure when you add reversed direction it adds the red arrow
 function deleteState(id, otherStates) {
 	document.getElementById(id).remove();
 	if (localConnections[id]) {
@@ -78,7 +76,7 @@ function deleteState(id, otherStates) {
 			lConnections[i].path.remove();
 		}
 	}
-	for (let i = 0; i < otherStates.length; i++) {
+	for (let i = 0; i < otherStates.length-1; i++) {
 		if (localConnections['state-ball-' + otherStates[i]]) {
 			let otherConnections = localConnections['state-ball-' + otherStates[i]];
 			for (let i = 0; i < otherConnections.length; i++) {
@@ -98,7 +96,13 @@ function removeState(id) {
 	xhr.open('POST', "removeState/", true);
 	xhr.onload = function() {
 		if (this.status == 200) {
-			deleteState(id, this.responseText.split('-'));
+			if (this.responseText == '0') {
+				alert("An error has occurred.");
+			} else if (this.responseText == '2') {
+				alert("You can't delete the initial state.");
+			} else {
+				deleteState(id, this.responseText.split('-'));
+			}
 		}
 	}
 	xhr.setRequestHeader('X-CSRFToken', csrftoken);

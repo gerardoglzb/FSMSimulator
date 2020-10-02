@@ -96,6 +96,12 @@ def removeState(request):
 	except State.DoesNotExist:
 		state = None
 	if state:
+		try:
+			initialState = State.objects.get(initialStateOf=stateMachine)
+		except State.DoesNotExist:
+			return HttpResponse('0')
+		if initialState == state:
+			return HttpResponse('2')
 		pathsCode = ''
 		for connection in Connection.objects.all().filter(target=state):
 			pathsCode += str(connection.origin.pk) + '-'

@@ -38,7 +38,6 @@ function addTransitionContainer(line, lineAngle) {
 	}
 }
 
-console.log("do");
 function deleteText() {
 	let container = selectedText.parentElement;
 	let line = container.parentElement;
@@ -53,10 +52,8 @@ function deleteText() {
 			}
 			if (counter == 0) {
 				localConnections[originBall.id].splice(i, 1);
-				console.log("no moure connections");
 			} else {
 				localConnections[originBall.id][i].transitions.splice(j, 1);
-				console.log("hm es connections");
 			}
 			break;
 		}
@@ -68,8 +65,6 @@ function deleteText() {
 			break;
 		}
 	}
-	console.log("counter", counter);
-	console.log("reverseCounter", reverseCounter);
 	if (counter == 0 && reverseCounter == 0) {
 		line.remove();
 	} else {
