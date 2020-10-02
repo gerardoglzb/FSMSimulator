@@ -38,6 +38,7 @@ function addTransitionContainer(line, lineAngle) {
 	}
 }
 
+console.log("do");
 function deleteText() {
 	let container = selectedText.parentElement;
 	let line = container.parentElement;
@@ -45,11 +46,19 @@ function deleteText() {
 	let reverseCounter = 0;
 	for (let i = 0; i < localConnections[originBall.id].length; i++) {
 		if (localConnections[originBall.id][i].target == targetBall) {
-			if (localConnections[originBall.id][i].transition == selectedText.innerText) {
-				localConnections[originBall.id].splice(i, 1);
-			} else {
-				counter++;
+			for (let j = 0; j < localConnections[originBall.id][i].transitions.length; j++) {
+				if (localConnections[originBall.id][i].transitions[j] != selectedText.innerText) {
+					counter++;
+				}
 			}
+			if (counter == 0) {
+				localConnections[originBall.id].splice(i, 1);
+				console.log("no moure connections");
+			} else {
+				localConnections[originBall.id][i].transitions.splice(j, 1);
+				console.log("hm es connections");
+			}
+			break;
 		}
 	}
 	let containerTexts = container.getElementsByClassName('line-text');
@@ -59,13 +68,18 @@ function deleteText() {
 			break;
 		}
 	}
+	console.log("counter", counter);
+	console.log("reverseCounter", reverseCounter);
 	if (counter == 0 && reverseCounter == 0) {
 		line.remove();
-	} else if (reverseCounter == 0) {
-		selectedText.remove();
-		line.getElementsByClassName('second-arrow-head')[0].remove();
-		currentLine.getElementsByClassName('arrow-body')[0].style.width = 'calc(100% - 30px)';
 	} else {
+		if (reverseCounter == 0) {
+			let secondArrowHead = line.getElementsByClassName('second-arrow-head')[0];
+			if (secondArrowHead){
+				secondArrowHead.remove();
+				line.getElementsByClassName('arrow-body')[0].style.width = 'calc(100% - 30px)';
+			}
+		}
 		selectedText.remove();
 		let textCount = container.getElementsByClassName('line-text').length;
 		container.style.top = (-20 * textCount) + 'px';
