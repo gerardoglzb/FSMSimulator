@@ -97,4 +97,4 @@ Project Link: [https://github.com/gerardoglzb/FSMSimulator](https://github.com/g
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[product-screenshot]: https://www.youtube.com/watch?v=MHckpO5eQuc
+[product-screenshot]: https://media.giphy.com/media/OFx2CMlnUkDCvmytKK/giphy.gif
