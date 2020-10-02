@@ -51,12 +51,14 @@ A web-based finite state machine
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-The website allows users to design and test finite automatons.
+The website allows users to design and test deterministc finite automatons.
 
 You can create a new state by double clicking anywhere on the canvas. You can also drag it around the canvas by clicking and holding. A single click will allow you to edit the name of the state or delete it by pressing the Delete key on your keyboard.
 The value of any state is either True or False, with the latter being the default. You can switch between these by double clicking on a state.
 
-By pressing Shift, you can connect two different states and then add a transition character between them. You can also click on these transitions at any time to edit them or delete them with the Delete key on your keyboard.
+By pressing Shift, you can connect two different states and then add a transition character (it has to be a single character) between them. You can also click on these transitions at any time to edit them or delete them with the Delete key on your keyboard.
+
+Bidrectional connections are marked by the color of the background of the transition character in the arrow and the color of the corresponsing arrow head.
 
 To reassign the initial state, just click and hold a state without dragging it around for a couple seconds. This state can be easily identified as the only state with a blue name.
 
@@ -64,7 +66,7 @@ On the left sidebar, you can type in and test different strings, either one at a
 
 All of your process will be saved next time you enter.
 
-These functionalities will improve in the future.
+These functionalities will improve in the future. Bugs are constantly being fixed.
 
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -95,4 +97,4 @@ Project Link: [https://github.com/gerardoglzb/FSMSimulator](https://github.com/g
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-<!-- [product-screenshot]: imgs/screenshot.png -->
+[product-screenshot]: https://www.youtube.com/watch?v=MHckpO5eQuc

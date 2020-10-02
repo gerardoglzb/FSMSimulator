@@ -68,6 +68,8 @@ function changeInitialState(id) {
 	xhr.send(data);
 }
 
+// if initial state gets deleted, then change initial state, if there aren't anymore states, create one or... prevent deletion actually...
+// also make sure when you add reversed direction it adds the red arrow
 function deleteState(id, otherStates) {
 	document.getElementById(id).remove();
 	if (localConnections[id]) {
@@ -139,10 +141,19 @@ function storeName() {
 	const csrftoken = getCookie('csrftoken');
 	let xhr = new XMLHttpRequest();
 	xhr.open('POST', "storeName/", true);
+	let stateText = this;
+	xhr.onload = function() {
+		if (this.status == 200) {
+			if (this.responseText == '') {
+				stateText.innerText = ballText;
+				alert("The name you tried to use contained a non-acceptable character. Please think of another one.");
+			}
+		}
+	}
 	xhr.setRequestHeader('X-CSRFToken', csrftoken);
 	let data = new FormData();
 	data.append('id', this.parentElement.id.substr(11));
-	data.append('name', this.innerText);
+	data.append('name', stateText.innerText);
 	xhr.send(data);
 }
 

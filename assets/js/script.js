@@ -36,3 +36,4 @@ let normalStateColor = '#FB8F67';
 let circleDiameter = 50;
 let currentCircle;
 let isNewLine;
+let ballText;

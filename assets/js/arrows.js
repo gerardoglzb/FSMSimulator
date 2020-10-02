@@ -281,7 +281,9 @@ function startDragging(e) {
 		this.addEventListener('mouseleave', activateArrow);
 		return;
 	}
-	this.getElementsByClassName('noselect')[0].focus();
+	let stateText = this.getElementsByClassName('noselect')[0];
+	stateText.focus();
+	ballText = stateText.innerText;
 	currentBall = this;
 	if (holdingID) {
 		clearInterval(holdingID);

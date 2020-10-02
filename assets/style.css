@@ -297,3 +297,7 @@ body {
 	text-decoration: none;
 	cursor: pointer;
 }
+
+textarea {
+  overflow-x: hidden
+}

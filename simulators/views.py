@@ -80,9 +80,12 @@ def storeName(request):
 	except State.DoesNotExist:
 		state = None
 	if state:
-		state.name = request.POST['name']
+		potentialName = request.POST['name']
+		if '\r' in potentialName or '\n' in potentialName:
+			return HttpResponse('')
+		state.name = potentialName
 		state.save()
-	return HttpResponse()
+	return HttpResponse('1')
 
 @csrf_exempt
 def removeState(request):
@@ -298,6 +301,12 @@ def multiTestSample(request):
 		negatives = []
 	else:
 		negatives = negatives.split('\n')
+	for i, p in enumerate(positives):
+		if p != '' and p[-1] == '\r':
+			positives[i] = p[:-1]
+	for i, n in enumerate(negatives):
+		if n != '' and n[-1] == '\r':
+			negatives[i] = n[:-1]
 	posResponse = ''
 	negResponse = ''
 	for pos in positives:
