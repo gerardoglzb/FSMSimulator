@@ -37,7 +37,7 @@
 
 [![Product Name Screen Shot][product-screenshot]](https://github.com/gerardoglzb/FSMSimulator)
 
-A web-based finite state machine
+A web-based finite state machine simulator.
 
 ### Built With
 * HTML5
