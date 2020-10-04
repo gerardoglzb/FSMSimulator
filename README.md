@@ -10,7 +10,7 @@
     <a href="https://github.com/gerardoglzb/FSMSimulator"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/gerardoglzb/FSMSimulator">Demo Not Available</a>
+    <a href="https://fsmsimulator.herokuapp.com/">Demo</a>
     ·
     <a href="https://github.com/gerardoglzb/FSMSimulator/issues">Report Bug</a>
     ·
